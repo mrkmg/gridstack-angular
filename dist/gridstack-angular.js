@@ -124,42 +124,42 @@ app.directive('gridstackItem', ['$timeout', function($timeout) {
       gsItemMaxWidth: '=?'
     },
     link: function(scope, element, attrs, controller) {
+      var jqElement = $(element);
+
       if (scope.gsItemId) {
-        $(element).attr('data-gs-id', scope.gsItemId);
+        jqElement.attr('data-gs-id', scope.gsItemId);
       }
-      $(element).attr('data-gs-x', scope.gsItemX);
-      $(element).attr('data-gs-y', scope.gsItemY);
-      $(element).attr('data-gs-width', scope.gsItemWidth);
-      $(element).attr('data-gs-height', scope.gsItemHeight);
-      $(element).attr('data-gs-min-width', scope.gsItemMinWidth);
-      $(element).attr('data-gs-min-height', scope.gsItemMinHeight);
-      $(element).attr('data-gs-max-width', scope.gsItemMaxWidth);
-      $(element).attr('data-gs-max-height', scope.gsItemMaxHeight);
-      $(element).attr('data-gs-auto-position', scope.gsItemAutopos);
+      jqElement.attr('data-gs-x', scope.gsItemX);
+      jqElement.attr('data-gs-y', scope.gsItemY);
+      jqElement.attr('data-gs-width', scope.gsItemWidth);
+      jqElement.attr('data-gs-height', scope.gsItemHeight);
+      jqElement.attr('data-gs-min-width', scope.gsItemMinWidth);
+      jqElement.attr('data-gs-min-height', scope.gsItemMinHeight);
+      jqElement.attr('data-gs-max-width', scope.gsItemMaxWidth);
+      jqElement.attr('data-gs-max-height', scope.gsItemMaxHeight);
+      jqElement.attr('data-gs-auto-position', scope.gsItemAutopos);
       var widget = controller.addItem(element);
       var item = element.data('_gridstack_node');
       $timeout(function() {
         scope.onItemAdded({item: item});
       });
 
-      scope.$watch(function() { return $(element).attr('data-gs-id'); }, function(val) {
-        scope.gsItemId = val;
-      });
+      item._grid.container.on('change', function(ev, elements) {
+        if (!elements) {
+          return;
+        }
 
-      scope.$watch(function() { return $(element).attr('data-gs-x'); }, function(val) {
-        scope.gsItemX = Number(val);
-      });
-
-      scope.$watch(function() { return $(element).attr('data-gs-y'); }, function(val) {
-        scope.gsItemY = Number(val);
-      });
-
-      scope.$watch(function() { return $(element).attr('data-gs-width'); }, function(val) {
-        scope.gsItemWidth = Number(val);
-      });
-
-      scope.$watch(function() { return $(element).attr('data-gs-height'); }, function(val) {
-        scope.gsItemHeight = Number(val);
+        var i, element;
+        for(i = 0; i < elements.length; i++) {
+          element = elements[i];
+          if(element.el.get(0) == jqElement.get(0)) {
+            scope.gsItemId = element.id;
+            scope.gsItemX = element.x;
+            scope.gsItemY = element.y;
+            scope.gsItemWidth = element.width;
+            scope.gsItemHeight = element.height;
+          }
+        }
       });
 
       element.bind('$destroy', function() {
